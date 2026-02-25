@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡La Aventura de Marie Curie!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --rosa: #E91E8C;
+    --azul: #1A237E;
+    --cielo: #42A5F5;
+    --amarillo: #FFD600;
+    --verde: #00C853;
+    --rojo: #FF1744;
+    --blanco: #FAFAFA;
+    --lavanda: #EDE7F6;
+    --naranja: #FF6D00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #1A237E 0%, #283593 40%, #1565C0 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  .stars {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    width: 4px; height: 4px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s infinite alternate;
+  }
+
+  @keyframes twinkle {
+    from { opacity: 0.2; transform: scale(0.8); }
+    to   { opacity: 1;   transform: scale(1.2); }
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    width: 90%; max-width: 780px;
+    background: var(--blanco);
+    border-radius: 32px;
+    padding: 36px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: entrada 0.7s ease;
+  }
+
+  @keyframes entrada {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ===== PANTALLA INICIO ===== */
+  .inicio-header {
+    text-align: center;
+    background: linear-gradient(135deg, var(--rosa), var(--azul));
+    border-radius: 20px;
+    padding: 28px 20px 20px;
+    color: white;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .inicio-header::before {
+    content: '⚗️';
+    font-size: 80px;
+    position: absolute;
+    right: -10px; top: -10px;
+    opacity: 0.15;
+  }
+  .inicio-header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2rem;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+    margin-bottom: 6px;
+  }
+  .inicio-header p { font-size: 1rem; opacity: 0.9; }
+
+  .marie-img {
+    font-size: 90px;
+    text-align: center;
+    margin: 16px 0;
+    animation: flotar 3s ease-in-out infinite;
+  }
+  @keyframes flotar {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+  }
+
+  .intro-text {
+    background: var(--lavanda);
+    border-radius: 16px;
+    padding: 18px 20px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 24px;
+    border-left: 5px solid var(--rosa);
+  }
+  .intro-text strong { color: var(--rosa); }
+
+  /* ===== CAMPO NOMBRE EN INICIO ===== */
+  .nombre-inicio-box {
+    background: linear-gradient(135deg, #E8EAF6, var(--lavanda));
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 2px solid #C5CAE9;
+    text-align: center;
+  }
+  .nombre-inicio-box h3 {
+    font-family: 'Fredoka One', cursive;
+    color: var(--azul);
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+  }
+  .nombre-inicio-box p {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+  }
+  .nombre-input {
+    width: 100%;
+    padding: 14px 20px;
+    border: 3px solid #C5CAE9;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+    color: var(--azul);
+    background: white;
+  }
+  .nombre-input:focus { border-color: var(--rosa); }
+  .nombre-error {
+    color: var(--rojo);
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 8px;
+    display: none;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    text-align: center;
+  }
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-rosa    { background: linear-gradient(135deg, var(--rosa), #AD1457); color: white; }
+  .btn-azul    { background: linear-gradient(135deg, var(--cielo), var(--azul)); color: white; }
+  .btn-verde   { background: linear-gradient(135deg, var(--verde), #1B5E20); color: white; }
+  .btn-naranja { background: linear-gradient(135deg, var(--amarillo), var(--naranja)); color: white; }
+
+  /* ===== QUIZ ===== */
+  .quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .prog-label { font-weight: 800; color: var(--azul); font-size: 1rem; }
+  .alumno-badge {
+    background: linear-gradient(135deg, var(--rosa), #AD1457);
+    color: white;
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.95rem;
+    padding: 5px 14px;
+    border-radius: 50px;
+  }
+  .puntaje-badge {
+    background: var(--amarillo);
+    color: var(--azul);
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    padding: 6px 18px;
+    border-radius: 50px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
+  .barra-prog {
+    width: 100%;
+    height: 12px;
+    background: #E0E0E0;
+    border-radius: 50px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .barra-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rosa), var(--azul));
+    border-radius: 50px;
+    transition: width 0.5s ease;
+  }
+  .pregunta-card {
+    background: linear-gradient(135deg, #E8EAF6, var(--lavanda));
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 22px;
+    border: 2px solid #C5CAE9;
+  }
+  .pregunta-num {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--rosa);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .pregunta-texto {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1A237E;
+    line-height: 1.5;
+  }
+  .opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .opcion {
+    padding: 14px 16px;
+    border: 3px solid #C5CAE9;
+    border-radius: 16px;
+    background: white;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #333;
+    transition: all 0.2s;
+    text-align: left;
+    line-height: 1.4;
+  }
+  .opcion:hover:not(.disabled) { border-color: var(--rosa); background: #FCE4EC; transform: translateY(-2px); }
+  .opcion.correcta  { background: #E8F5E9; border-color: var(--verde); color: #1B5E20; }
+  .opcion.incorrecta { background: #FFEBEE; border-color: var(--rojo); color: var(--rojo); }
+  .opcion.disabled  { pointer-events: none; }
+
+  .feedback-box {
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    display: none;
+    animation: pop 0.3s ease;
+  }
+  @keyframes pop {
+    0%   { transform: scale(0.9); opacity: 0; }
+    60%  { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .feedback-box.correcto  { background: #E8F5E9; color: #1B5E20; border: 2px solid var(--verde); }
+  .feedback-box.incorrecto { background: #FFEBEE; color: #B71C1C; border: 2px solid var(--rojo); }
+
+  .dato-curioso {
+    background: linear-gradient(135deg, #FFF8E1, #FFF3CD);
+    border: 2px dashed var(--amarillo);
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 0.9rem;
+    color: #5D4037;
+    margin-bottom: 18px;
+    display: none;
+  }
+  .dato-curioso span { font-weight: 800; color: var(--naranja); }
+
+  /* ===== DIPLOMA / FINAL ===== */
+  .diploma {
+    background: linear-gradient(135deg, #1A237E, #283593);
+    border-radius: 24px;
+    padding: 32px;
+    color: white;
+    text-align: center;
+    border: 6px solid var(--amarillo);
+    position: relative;
+    overflow: hidden;
+  }
+  .diploma::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255,214,0,0.08), transparent 70%);
+  }
+  .diploma h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2rem;
+    color: var(--amarillo);
+    margin-bottom: 8px;
+  }
+  .diploma .nombre-final {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 0 0 20px rgba(255,214,0,0.5);
+    margin: 12px 0;
+  }
+  .diploma .stars-deco { font-size: 2rem; margin: 8px 0; }
+  .diploma p { font-size: 1rem; opacity: 0.9; line-height: 1.6; margin: 8px 0; }
+
+  /* Tabla de resultados */
+  .resultado-tabla {
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 18px;
+    margin: 16px 0;
+    text-align: left;
+  }
+  .resultado-tabla h3 {
+    font-family: 'Fredoka One', cursive;
+    color: var(--amarillo);
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .resultado-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.07);
+  }
+  .resultado-fila.correcta-fila { background: rgba(0,200,83,0.2); }
+  .resultado-fila.incorrecta-fila { background: rgba(255,23,68,0.2); }
+  .resultado-fila .icono { font-size: 1rem; margin-right: 6px; }
+  .resultado-fila .puntos { font-family: 'Fredoka One', cursive; color: var(--amarillo); }
+
+  .score-final {
+    background: var(--amarillo);
+    color: var(--azul);
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2rem;
+    border-radius: 16px;
+    padding: 12px 24px;
+    display: inline-block;
+    margin: 10px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  .calificacion-badge {
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 50px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    margin: 6px 0 12px;
+  }
+  .mensaje-final {
+    background: rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 16px;
+    margin: 12px 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Stats circulares */
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    background: rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 12px 18px;
+    text-align: center;
+    min-width: 90px;
+  }
+  .stat-num {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--amarillo);
+  }
+  .stat-label { font-size: 0.75rem; opacity: 0.8; }
+
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 14px;
+    border-radius: 2px;
+    top: -20px;
+    animation: caer 3s ease-in forwards;
+    pointer-events: none;
+    z-index: 999;
+  }
+  @keyframes caer {
+    to { top: 110vh; transform: rotate(720deg) translateX(60px); }
+  }
+
+  @media (max-width: 500px) {
+    .opciones { grid-template-columns: 1fr; }
+    .inicio-header h1 { font-size: 1.6rem; }
+    .container { padding: 20px; }
+    .diploma .nombre-final { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+
+  <!-- PANTALLA 1: INICIO con campo de nombre -->
+  <div class="screen active" id="screen-inicio">
+    <div class="inicio-header">
+      <h1>🔬 ¡La Aventura de Marie Curie!</h1>
+      <p>Un juego sobre igualdad, ciencia y valentía</p>
+    </div>
+    <div class="marie-img">👩‍🔬</div>
+    <div class="intro-text">
+      <strong>¡Hola, científico/a!</strong> 🌟<br><br>
+      Marie Curie fue una mujer increíble que demostró que <strong>las niñas y los niños pueden hacer lo mismo</strong>. 
+      Fue la primera persona en ganar <strong>dos Premios Nobel</strong> y descubrió elementos como el <strong>Radio</strong> y el <strong>Polonio</strong>.<br><br>
+      ¡Pon a prueba tu conocimiento sobre su vida y la <strong>igualdad de género</strong>!
+    </div>
+
+    <div class="nombre-inicio-box">
+      <h3>👤 ¿Cuál es tu nombre?</h3>
+      <p>Escribe tu nombre para personalizar tu diploma al final</p>
+      <input class="nombre-input" type="text" id="input-nombre-inicio"
+             placeholder="Tu nombre aquí..." maxlength="30" autocomplete="off">
+      <div class="nombre-error" id="nombre-error">⚠️ Por favor escribe tu nombre para comenzar</div>
+    </div>
+
+    <button class="btn btn-rosa" onclick="iniciarJuego()">¡Empezar la Aventura! 🚀</button>
+  </div>
+
+  <!-- PANTALLA 2: QUIZ -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-top">
+      <span class="prog-label">Pregunta <span id="num-preg">1</span> de 10</span>
+      <span class="alumno-badge" id="alumno-badge">👤 Alumno</span>
+      <span class="puntaje-badge">⭐ <span id="puntaje-actual">0</span> pts</span>
+    </div>
+    <div class="barra-prog"><div class="barra-fill" id="barra-fill" style="width:10%"></div></div>
+
+    <div class="pregunta-card">
+      <div class="pregunta-num" id="preg-num">Pregunta 1</div>
+      <div class="pregunta-texto" id="preg-texto"></div>
+    </div>
+
+    <div class="opciones" id="opciones-grid"></div>
+    <div class="feedback-box" id="feedback"></div>
+    <div class="dato-curioso" id="dato-curioso"><span>💡 ¿Sabías que...? </span><span id="dato-texto"></span></div>
+
+    <button class="btn btn-azul" id="btn-siguiente" onclick="siguientePregunta()" style="display:none">Siguiente →</button>
+  </div>
+
+  <!-- PANTALLA 3: DIPLOMA FINAL -->
+  <div class="screen" id="screen-diploma">
+    <div class="diploma">
+      <div style="font-size:56px">🏅</div>
+      <h2>DIPLOMA DE CIENTÍFICO/A</h2>
+      <div class="stars-deco">⭐ ⭐ ⭐</div>
+      <p>Este diploma se otorga a:</p>
+      <div class="nombre-final" id="nombre-final"></div>
+
+      <div style="font-size:0.9rem; opacity:0.75; margin-bottom:4px;">Calificaci&oacute;n</div>
+      <div class="score-final" id="score-final"></div>
+      <div style="font-size:0.85rem; opacity:0.65; margin-bottom:6px;">/ 10</div>
+      <div class="calificacion-badge" id="calificacion-badge"></div>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-correctas">0</div>
+          <div class="stat-label">&#9989; Correctas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-incorrectas">0</div>
+          <div class="stat-label">&#10060; Incorrectas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-porcentaje">0%</div>
+          <div class="stat-label">&#128202; Aciertos</div>
+        </div>
+      </div>
+
+      <!-- Detalle de respuestas -->
+      <div class="resultado-tabla">
+        <h3>📋 Resumen de respuestas</h3>
+        <div id="resumen-respuestas"></div>
+      </div>
+
+      <div class="mensaje-final" id="mensaje-final"></div>
+
+      <p style="margin-top:12px; font-size:0.82rem; opacity:0.7">
+        "Nada en la vida debe ser temido, solo comprendido.<br>Ahora es tiempo de comprender más." — Marie Curie
+      </p>
+    </div>
+    <br>
+    <button class="btn btn-naranja" onclick="reiniciar()">🔄 Jugar de nuevo</button>
+  </div>
+
+</div>
+
+<script>
+const preguntas = [
+  {
+    texto: "¿En qué país nació Marie Curie en 1867?",
+    opciones: ["Francia 🇫🇷", "Polonia 🇵🇱", "Alemania 🇩🇪", "Rusia 🇷🇺"],
+    correcta: 1,
+    dato: "Marie nació en Varsovia, Polonia, y su nombre de pila era Maria Skłodowska.",
+    igualGenero: false
+  },
+  {
+    texto: "¿Por qué Marie Curie tuvo que estudiar en secreto cuando era joven?",
+    opciones: ["Le daba vergüenza", "Las mujeres no podían estudiar en Polonia 😔", "Era muy cara la escuela", "Le gustaba el misterio"],
+    correcta: 1,
+    dato: "En el siglo XIX, muchas mujeres no podían ir a la universidad. Marie estudió en la 'Universidad Flotante', una escuela secreta para mujeres.",
+    igualGenero: true
+  },
+  {
+    texto: "¿Cuántos Premios Nobel ganó Marie Curie?",
+    opciones: ["Uno 🥇", "Dos 🏆🏆", "Tres 🎖️", "Ninguno"],
+    correcta: 1,
+    dato: "¡Dos! Uno de Física (1903) y otro de Química (1911). Fue la primera persona en ganar dos Premios Nobel.",
+    igualGenero: false
+  },
+  {
+    texto: "Marie Curie fue la primera mujer en ganar el Premio Nobel. ¿Qué nos enseña esto sobre la igualdad de género?",
+    opciones: [
+      "Que las mujeres son mejores",
+      "Que las mujeres y hombres tienen el mismo talento y deben tener iguales oportunidades 🌟",
+      "Que solo las mujeres pueden hacer ciencia",
+      "Que los premios no importan"
+    ],
+    correcta: 1,
+    dato: "La igualdad de género significa que todas las personas, sin importar su género, merecen las mismas oportunidades de estudiar, trabajar y ser reconocidas.",
+    igualGenero: true
+  },
+  {
+    texto: "¿Qué elemento nuevo descubrió Marie Curie y nombró en honor a su país natal?",
+    opciones: ["Radio ☢️", "Polonio 🇵🇱", "Uranio", "Carbono"],
+    correcta: 1,
+    dato: "Marie nombró al Polonio en honor a Polonia, su país natal, que en ese tiempo no era reconocido como país independiente.",
+    igualGenero: false
+  },
+  {
+    texto: "Cuando Marie quería ir a la universidad en París, ¿qué actitud demostró que es importante para la igualdad?",
+    opciones: [
+      "Se rindió fácilmente",
+      "Esperó que otros lo hicieran por ella",
+      "Perseveró y luchó por su derecho a estudiar 💪",
+      "Pensó que no era capaz"
+    ],
+    correcta: 2,
+    dato: "La perseverancia y creer en uno mismo son clave para la igualdad. Marie no se rindió aunque el mundo le ponía obstáculos.",
+    igualGenero: true
+  },
+  {
+    texto: "¿Cuál es el nombre del fenómeno que Marie Curie estudió e investigó profundamente?",
+    opciones: ["La gravedad 🍎", "La electricidad ⚡", "La radiactividad ☢️", "La fotosíntesis 🌿"],
+    correcta: 2,
+    dato: "Marie Curie acuñó el término 'radiactividad'. Sus investigaciones ayudaron a desarrollar tratamientos contra el cáncer.",
+    igualGenero: false
+  },
+  {
+    texto: "Si en tu clase hay una niña que quiere ser científica, ¿qué debes hacer?",
+    opciones: [
+      "Decirle que la ciencia es para niños",
+      "Ignorarla",
+      "Animarla, porque todos pueden hacer ciencia 🔬✨",
+      "Competir con ella"
+    ],
+    correcta: 2,
+    dato: "Apoyar los sueños de todos, sin importar si son niñas o niños, es practicar la igualdad de género todos los días.",
+    igualGenero: true
+  },
+  {
+    texto: "Marie Curie trabajó junto a su esposo Pierre Curie. ¿Qué nos enseña esta colaboración?",
+    opciones: [
+      "Que las mujeres necesitan ayuda de los hombres",
+      "Que hombres y mujeres pueden trabajar juntos como equipo igualitario 🤝",
+      "Que el hombre hizo todo el trabajo",
+      "Que no se deben mezclar en la ciencia"
+    ],
+    correcta: 1,
+    dato: "Pierre y Marie eran un equipo igualitario. Incluso cuando le ofrecieron el Premio Nobel solo a Pierre, él insistió en que Marie fuera incluida.",
+    igualGenero: true
+  },
+  {
+    texto: "¿Cuál es la mejor forma de honrar el legado de Marie Curie?",
+    opciones: [
+      "Solo estudiar química",
+      "No hacer nada diferente",
+      "Creer que solo los adultos pueden cambiar el mundo",
+      "Tratar a todos con respeto e igualdad, y seguir curiosos por aprender 🌍❤️"
+    ],
+    correcta: 3,
+    dato: "Marie decía: 'Yo soy de las que piensan que la ciencia es de gran belleza.' ¡Ser curioso y respetar a todos es su mayor legado!",
+    igualGenero: true
+  }
+];
+
+let preguntaActual = 0;
+let puntaje = 0;
+let respondida = false;
+let nombreAlumno = '';
+let historialRespuestas = []; // guarda {texto, correcta, respondida} por pregunta
+
+function iniciarJuego() {
+  const inputNombre = document.getElementById('input-nombre-inicio');
+  const errorEl = document.getElementById('nombre-error');
+  const nombre = inputNombre.value.trim();
+
+  if (!nombre) {
+    errorEl.style.display = 'block';
+    inputNombre.focus();
+    inputNombre.style.borderColor = 'var(--rojo)';
+    return;
+  }
+
+  errorEl.style.display = 'none';
+  inputNombre.style.borderColor = '#C5CAE9';
+  nombreAlumno = nombre;
+
+  preguntaActual = 0;
+  puntaje = 0;
+  historialRespuestas = [];
+
+  // Mostrar nombre en el badge del quiz
+  document.getElementById('alumno-badge').textContent = '👤 ' + nombreAlumno;
+
+  mostrarPantalla('screen-quiz');
+  mostrarPregunta();
+}
+
+function mostrarPantalla(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function mostrarPregunta() {
+  respondida = false;
+  const p = preguntas[preguntaActual];
+  document.getElementById('num-preg').textContent = preguntaActual + 1;
+  document.getElementById('preg-num').textContent =
+    `Pregunta ${preguntaActual + 1} ${p.igualGenero ? '🌸 Igualdad de Género' : '🔬 Ciencia'}`;
+  document.getElementById('preg-texto').textContent = p.texto;
+  document.getElementById('barra-fill').style.width = ((preguntaActual + 1) / preguntas.length * 100) + '%';
+  document.getElementById('puntaje-actual').textContent = puntaje;
+
+  const grid = document.getElementById('opciones-grid');
+  grid.innerHTML = '';
+  p.opciones.forEach((op, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opcion';
+    btn.textContent = op;
+    btn.onclick = () => responder(i);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('dato-curioso').style.display = 'none';
+  document.getElementById('btn-siguiente').style.display = 'none';
+}
+
+function responder(indice) {
+  if (respondida) return;
+  respondida = true;
+  const p = preguntas[preguntaActual];
+  const opciones = document.querySelectorAll('.opcion');
+  opciones.forEach(o => o.classList.add('disabled'));
+
+  const esCorrecta = indice === p.correcta;
+  const feedback = document.getElementById('feedback');
+  const dato = document.getElementById('dato-curioso');
+
+  if (esCorrecta) {
+    puntaje += 10;
+    opciones[indice].classList.add('correcta');
+    feedback.className = 'feedback-box correcto';
+    feedback.innerHTML = '✅ ¡Correcto! ¡Excelente respuesta! +10 puntos';
+  } else {
+    opciones[indice].classList.add('incorrecta');
+    opciones[p.correcta].classList.add('correcta');
+    feedback.className = 'feedback-box incorrecto';
+    feedback.innerHTML = `❌ ¡Casi! La respuesta correcta era: <strong>${p.opciones[p.correcta]}</strong>`;
+  }
+
+  // Guardar en historial
+  historialRespuestas.push({
+    numero: preguntaActual + 1,
+    texto: p.texto,
+    correcta: esCorrecta,
+    respuestaAlumno: p.opciones[indice],
+    respuestaCorrecta: p.opciones[p.correcta]
+  });
+
+  feedback.style.display = 'block';
+  document.getElementById('dato-texto').textContent = p.dato;
+  dato.style.display = 'block';
+  document.getElementById('puntaje-actual').textContent = puntaje;
+  document.getElementById('btn-siguiente').style.display = 'block';
+}
+
+function siguientePregunta() {
+  preguntaActual++;
+  if (preguntaActual < preguntas.length) {
+    mostrarPregunta();
+  } else {
+    mostrarDiploma();
+  }
+}
+
+function mostrarDiploma() {
+  const correctas = historialRespuestas.filter(r => r.correcta).length;
+  const incorrectas = historialRespuestas.length - correctas;
+  const calificacion = correctas.toFixed(1); // Escala 0 - 10 (1 punto por pregunta)
+  const porcentaje = Math.round((correctas / preguntas.length) * 100);
+
+  document.getElementById('nombre-final').textContent = nombreAlumno;
+  document.getElementById('score-final').textContent = calificacion + ' / 10';
+  document.getElementById('stat-correctas').textContent = correctas;
+  document.getElementById('stat-incorrectas').textContent = incorrectas;
+  document.getElementById('stat-porcentaje').textContent = porcentaje + '%';
+
+  // Badge de calificación (escala 0-10)
+  const badge = document.getElementById('calificacion-badge');
+  let nivel, badgeColor, mensaje;
+
+  if (correctas >= 9) {
+    nivel = '🏆 ¡Sobresaliente!';
+    badgeColor = 'background: var(--amarillo); color: var(--azul);';
+    mensaje = `¡Increíble, ${nombreAlumno}! Eres tan brillante como Marie Curie. Tu conocimiento sobre ciencia e igualdad de género es extraordinario. ¡El mundo necesita personas como tú! 🌟🔬`;
+  } else if (correctas >= 7) {
+    nivel = '🥇 ¡Muy Bien!';
+    badgeColor = 'background: #C8E6C9; color: #1B5E20;';
+    mensaje = `¡Muy bien, ${nombreAlumno}! Aprendiste mucho sobre Marie Curie y la igualdad de género. Sigue estudiando y apoyando a todos sin importar su género. ¡Eres genial! 💪✨`;
+  } else if (correctas >= 5) {
+    nivel = '🥈 ¡Buen Intento!';
+    badgeColor = 'background: #BBDEFB; color: #0D47A1;';
+    mensaje = `¡Buen trabajo, ${nombreAlumno}! Conoces a Marie Curie y sabes que la igualdad importa. ¡Sigue aprendiendo! Recuerda: todos merecemos las mismas oportunidades. 📚💛`;
+  } else {
+    nivel = '🥉 ¡Sigue Adelante!';
+    badgeColor = 'background: #FFCCBC; color: #BF360C;';
+    mensaje = `¡Lo lograste, ${nombreAlumno}! Has dado el primer paso aprendiendo sobre Marie Curie. Recuerda siempre que todos somos iguales y podemos lograr grandes cosas. ¡Tú puedes! 🌈`;
+  }
+
+  badge.textContent = nivel;
+  badge.style.cssText = badgeColor;
+  document.getElementById('mensaje-final').textContent = mensaje;
+
+  // Generar resumen de respuestas (1 o 0 por pregunta)
+  const resumenEl = document.getElementById('resumen-respuestas');
+  resumenEl.innerHTML = '';
+  historialRespuestas.forEach(r => {
+    const fila = document.createElement('div');
+    fila.className = `resultado-fila ${r.correcta ? 'correcta-fila' : 'incorrecta-fila'}`;
+
+    const textoCorto = r.texto.length > 55 ? r.texto.substring(0, 55) + '…' : r.texto;
+    fila.innerHTML = `
+      <span><span class="icono">${r.correcta ? '✅' : '❌'}</span> <strong>P${r.numero}.</strong> ${textoCorto}</span>
+      <span class="puntos">${r.correcta ? '1' : '0'} / 1</span>
+    `;
+    resumenEl.appendChild(fila);
+  });
+
+  mostrarPantalla('screen-diploma');
+  lanzarConfeti();
+}
+
+function reiniciar() {
+  document.getElementById('input-nombre-inicio').value = '';
+  preguntaActual = 0;
+  puntaje = 0;
+  historialRespuestas = [];
+  nombreAlumno = '';
+  mostrarPantalla('screen-inicio');
+}
+
+function lanzarConfeti() {
+  const colores = ['#E91E8C','#FFD600','#42A5F5','#00C853','#FF6D00','white','#AD1457'];
+  for (let i = 0; i < 70; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.background = colores[Math.floor(Math.random() * colores.length)];
+      el.style.animationDuration = (2 + Math.random() * 2) + 's';
+      el.style.animationDelay = Math.random() * 0.5 + 's';
+      el.style.transform = `rotate(${Math.random() * 360}deg)`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4500);
+    }, i * 40);
+  }
+}
+
+// Estrellas de fondo
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random() * 100 + '%';
+  s.style.top  = Math.random() * 100 + '%';
+  s.style.animationDelay = Math.random() * 3 + 's';
+  s.style.animationDuration = (2 + Math.random() * 2) + 's';
+  s.style.width = s.style.height = (2 + Math.random() * 4) + 'px';
+  starsEl.appendChild(s);
+}
+
+// Enter para iniciar juego
+document.getElementById('input-nombre-inicio').addEventListener('keydown', e => {
+  if (e.key === 'Enter') iniciarJuego();
+});
+</script>
+</body>
+</html>
